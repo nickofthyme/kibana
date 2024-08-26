@@ -13,6 +13,9 @@ export function isNumericFieldForDatatable(table: Datatable | undefined, accesso
 }
 
 export function getFieldTypeFromDatatable(table: Datatable | undefined, accessor: string) {
-  return table?.columns.find((col) => col.id === accessor || getOriginalId(col.id) === accessor)
-    ?.meta.type;
+  return getDatatableColumn(table, accessor)?.meta.type;
+}
+
+export function getDatatableColumn(table: Datatable | undefined, accessor: string) {
+  return table?.columns.find((col) => col.id === accessor || getOriginalId(col.id) === accessor);
 }

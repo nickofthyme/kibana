@@ -15,7 +15,6 @@ import type { DatatableColumnConfig } from '../../../../common/expressions';
 import type { DataContextType } from './types';
 import { getContrastColor } from '../../../shared_components/coloring/utils';
 import { CellColorFn } from '../../../shared_components/coloring/get_cell_color_fn';
-
 import { isLensRange } from '../../../utils';
 
 const getParsedValue = (v: unknown) => {

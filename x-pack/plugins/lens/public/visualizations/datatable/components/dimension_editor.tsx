@@ -8,7 +8,7 @@
 import React, { useCallback } from 'react';
 import { i18n } from '@kbn/i18n';
 import { EuiFormRow, EuiSwitch, EuiButtonGroup, htmlIdGenerator } from '@elastic/eui';
-import { PaletteRegistry } from '@kbn/coloring';
+import { PaletteRegistry, ColorMapping } from '@kbn/coloring';
 import { getColorCategories } from '@kbn/chart-expressions-common';
 import { useDebouncedValue } from '@kbn/visualization-utils';
 import type { VisualizationDimensionEditorProps } from '../../../types';
@@ -26,6 +26,8 @@ import './dimension_editor.scss';
 import { CollapseSetting } from '../../../shared_components/collapse_setting';
 import { ColorMappingByValues } from '../../../shared_components/coloring/color_mapping_by_values';
 import { ColorMappingByTerms } from '../../../shared_components/coloring/color_mapping_by_terms';
+import { FormatFactory } from '../../../../common/types';
+import { getDatatableColumn } from '../../../../common/expressions/datatable/utils';
 
 const idPrefix = htmlIdGenerator()();
 
@@ -49,9 +51,10 @@ export function TableDimensionEditor(
   props: VisualizationDimensionEditorProps<DatatableVisualizationState> & {
     paletteService: PaletteRegistry;
     isDarkMode: boolean;
+    formatFactory: FormatFactory;
   }
 ) {
-  const { frame, accessor, isInlineEditing, isDarkMode } = props;
+  const { frame, accessor, isInlineEditing, isDarkMode, formatFactory } = props;
   const column = props.state.columns.find(({ columnId }) => accessor === columnId);
   const { inputValue: localState, handleInputChange: setLocalState } =
     useDebouncedValue<DatatableVisualizationState>({
@@ -73,6 +76,7 @@ export function TableDimensionEditor(
   if (column.isTransposed) return null;
 
   const currentData = frame.activeData?.[localState.layerId];
+  const formatter = formatFactory(getDatatableColumn(currentData, accessor)?.meta?.params);
   const datasource = frame.datasourceLayers?.[localState.layerId];
   const { dataType, isBucketed } = datasource?.getOperationForColumnId(accessor) ?? {};
   const showColorByTerms = shouldColorByTerms(dataType, isBucketed);
@@ -96,7 +100,9 @@ export function TableDimensionEditor(
   };
   // need to tell the helper that the colorStops are required to display
   const displayStops = applyPaletteParams(props.paletteService, activePalette, currentMinMax);
-  const categories = getColorCategories(currentData?.rows ?? [], accessor, false, [null]);
+  const categories = getColorCategories(currentData?.rows ?? [], accessor, formatter, false, [
+    null,
+  ]);
 
   return (
     <>

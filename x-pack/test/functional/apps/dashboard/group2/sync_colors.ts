@@ -36,7 +36,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
     return colorMapping;
   }
 
-  describe('sync colors', function () {
+  describe('sync colors - nick', function () {
     before(async function () {
       await esArchiver.loadIfNeeded('x-pack/test/functional/es_archives/logstash_functional');
       await kibanaServer.importExport.load(

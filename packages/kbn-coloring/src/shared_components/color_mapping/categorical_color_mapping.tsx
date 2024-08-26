@@ -15,10 +15,17 @@ import { Container } from './components/container/container';
 import { ColorMapping } from './config';
 import { uiReducer } from './state/ui';
 
+type ColorMappingCategoryValue = string | string[];
+interface ColorMappingCategory {
+  value: ColorMappingCategoryValue;
+  display?: ColorMappingCategoryValue;
+}
 export interface ColorMappingInputCategoricalData {
   type: 'categories';
   /** an ORDERED array of categories rendered in the visualization  */
-  categories: Array<string | string[]>;
+  // categories: Array<string | string[]>;
+  /** 1:1 relation from categories used or displaying in assignment UI  */
+  categories: ColorMappingCategory[];
 }
 
 export interface ColorMappingInputContinuousData {

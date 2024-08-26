@@ -62,7 +62,7 @@ export function AssignmentsConfig({
 
   const unmatchingCategories = useMemo(() => {
     return data.type === 'categories'
-      ? data.categories.filter((category) => {
+      ? data.categories.filter(({ value: category }) => {
           return !assignments.some(({ rule }) => ruleMatch(rule, category));
         })
       : [];
@@ -120,7 +120,7 @@ export function AssignmentsConfig({
           return {
             rule: {
               type: 'matchExactly',
-              values: [c],
+              values: [c.value],
             },
             color:
               colorMode.type === 'categorical'

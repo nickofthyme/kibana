@@ -25,6 +25,7 @@ import {
   PaletteOutput,
   PaletteRegistry,
   CustomPaletteParams,
+  ColorMappingInputCategoricalData,
 } from '@kbn/coloring';
 import { i18n } from '@kbn/i18n';
 import { trackUiCounterEvents } from '../../lens_ui_telemetry';
@@ -41,7 +42,7 @@ interface ColorMappingByTermsProps {
   setColorMapping: (colorMapping?: ColorMapping.Config) => void;
   paletteService: PaletteRegistry;
   panelRef: MutableRefObject<HTMLDivElement | null>;
-  categories: Array<string | string[]>;
+  categories: ColorMappingInputCategoricalData['categories'];
 }
 
 export function ColorMappingByTerms({

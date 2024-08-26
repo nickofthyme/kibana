@@ -32,8 +32,8 @@ import { ClickTriggerEvent } from '@kbn/charts-plugin/public';
 import { IconChartDatatable } from '@kbn/chart-icons';
 import useObservable from 'react-use/lib/useObservable';
 import { getColorCategories } from '@kbn/chart-expressions-common';
+import type { IFieldFormat } from '@kbn/field-formats-plugin/common';
 import type { LensTableRowContextMenuEvent } from '../../../types';
-import type { FormatFactory } from '../../../../common/types';
 import { RowHeightMode } from '../../../../common/types';
 import { getOriginalId, isTransposeId, LensGridDirection } from '../../../../common/expressions';
 import { VisualizationContainer } from '../../../visualization_container';
@@ -150,7 +150,7 @@ export const DatatableComponent = (props: DatatableRenderProps) => {
 
   const { getType, dispatchEvent, renderMode, formatFactory, syncColors } = props;
 
-  const formatters: Record<string, ReturnType<FormatFactory>> = useMemo(
+  const formatters: Record<string, IFieldFormat> = useMemo(
     () =>
       firstLocalTable.columns.reduce(
         (map, column) => ({
@@ -412,6 +412,7 @@ export const DatatableComponent = (props: DatatableRenderProps) => {
             categories: getColorCategories(
               firstLocalTable.rows,
               originalId,
+              undefined,
               isTransposeId(columnId),
               [null]
             ),

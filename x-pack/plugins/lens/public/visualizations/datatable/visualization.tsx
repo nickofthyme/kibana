@@ -25,7 +25,7 @@ import type {
 } from '../../types';
 import { TableDimensionDataExtraEditor, TableDimensionEditor } from './components/dimension_editor';
 import { TableDimensionEditorAdditionalSection } from './components/dimension_editor_addtional_section';
-import type { LayerType } from '../../../common/types';
+import type { FormatFactory, LayerType } from '../../../common/types';
 import { RowHeightMode } from '../../../common/types';
 import { getDefaultSummaryLabel } from '../../../common/expressions/datatable/summary';
 import type {
@@ -63,9 +63,11 @@ const visualizationLabel = i18n.translate('xpack.lens.datatable.label', {
 export const getDatatableVisualization = ({
   paletteService,
   kibanaTheme,
+  formatFactory,
 }: {
   paletteService: PaletteRegistry;
   kibanaTheme: ThemeServiceStart;
+  formatFactory: FormatFactory;
 }): Visualization<DatatableVisualizationState> => ({
   id: 'lnsDatatable',
 
@@ -404,7 +406,12 @@ export const getDatatableVisualization = ({
     const isDarkMode = useObservable(kibanaTheme.theme$, { darkMode: false }).darkMode;
 
     return (
-      <TableDimensionEditor {...props} isDarkMode={isDarkMode} paletteService={paletteService} />
+      <TableDimensionEditor
+        {...props}
+        isDarkMode={isDarkMode}
+        paletteService={paletteService}
+        formatFactory={formatFactory}
+      />
     );
   },
 
