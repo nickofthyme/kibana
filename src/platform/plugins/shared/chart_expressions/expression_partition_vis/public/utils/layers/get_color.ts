@@ -14,6 +14,7 @@ import type { FieldFormatsStart } from '@kbn/field-formats-plugin/public';
 import type { FieldFormat } from '@kbn/field-formats-plugin/common';
 import { lightenColor } from '@kbn/charts-plugin/public';
 import type { Datatable } from '@kbn/expressions-plugin/public';
+import { SerializedValue } from '@kbn/data-plugin/common';
 import { BucketColumns, ChartTypes, PartitionVisParams } from '../../../common/types';
 import { DistinctSeries } from '../get_distinct_series';
 import { getNodeLabel } from './get_node_labels';
@@ -144,7 +145,8 @@ const createSeriesLayers = (
   isSplitChart: boolean,
   formatters: Record<string, FieldFormat | undefined>,
   formatter: FieldFormatsStart,
-  column: Partial<BucketColumns>
+  column: Partial<BucketColumns>,
+  colorIndexMap?: Map<SerializedValue, number>
 ): SeriesLayer[] => {
   const seriesLayers: SeriesLayer[] = [];
   let tempParent: typeof arrayNode | (typeof arrayNode)['parent'] = arrayNode;
@@ -213,7 +215,8 @@ export const getColor = (
   isDarkMode: boolean,
   formatter: FieldFormatsStart,
   column: Partial<BucketColumns>,
-  formatters: Record<string, FieldFormat | undefined>
+  formatters: Record<string, FieldFormat | undefined>,
+  colorIndexMap?: Map<SerializedValue, number>
 ) => {
   // Mind the difference here: the contrast computation for the text ignores the alpha/opacity
   // therefore change it for dark mode
@@ -244,7 +247,8 @@ export const getColor = (
     isSplitChart,
     formatters,
     formatter,
-    column
+    column,
+    colorIndexMap
   );
 
   const overriddenColor = overrideColors(seriesLayers, overwriteColors, name);
