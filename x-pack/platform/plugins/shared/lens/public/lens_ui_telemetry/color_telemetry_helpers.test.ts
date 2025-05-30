@@ -5,7 +5,7 @@
  * 2.0.
  */
 
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import {
   ColorMapping,
@@ -34,7 +34,7 @@ const exampleAssignment = (
         };
 
   return {
-    rules: Array.from({ length: valuesCount }, () => faker.random.alpha()).map((value) => ({
+    rules: Array.from({ length: valuesCount }, () => faker.string.alpha()).map((value) => ({
       type: 'raw',
       value,
     })),
