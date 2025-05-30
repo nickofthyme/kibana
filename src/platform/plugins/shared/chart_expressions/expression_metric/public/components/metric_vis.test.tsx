@@ -18,8 +18,8 @@ import { SerializableRecord } from '@kbn/utility-types';
 import { CustomPaletteState } from '@kbn/charts-plugin/common/expressions/palette/types';
 import { MetricVisParam } from '../../common';
 import { DEFAULT_TRENDLINE_NAME } from '../../common/constants';
-import faker from 'faker';
 import { PaletteOutput } from '@kbn/coloring';
+import { faker } from '@faker-js/faker';
 import { setupChartMocks, cleanChartMocks } from './chart_testing_utilities';
 import { euiThemeVars } from '@kbn/ui-theme';
 
@@ -651,47 +651,47 @@ describe('MetricVisComponent', function () {
       // Raw values here, not formatted
       const trends: Record<string, MetricWTrend['trend']> = {
         Friday: [
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
         ],
         Wednesday: [
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
         ],
         Saturday: [
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
         ],
         Sunday: [
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
         ],
         Thursday: [
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
         ],
         __other__: [
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
         ],
         // this one shouldn't show up!
         [DEFAULT_TRENDLINE_NAME]: [
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
-          { x: faker.random.number(), y: faker.random.number() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
+          { x: faker.number.int(), y: faker.number.int() },
         ],
       };
 
@@ -871,7 +871,7 @@ describe('MetricVisComponent', function () {
     afterEach(() => mockGetColorForValue.mockClear());
 
     describe('by palette', () => {
-      const colorFromPalette = faker.internet.color();
+      const colorFromPalette = faker.color.rgb();
       mockGetColorForValue.mockReturnValue(colorFromPalette);
 
       it('should fetch color from palette if provided', async () => {
@@ -975,7 +975,7 @@ describe('MetricVisComponent', function () {
 
     describe('by static color', () => {
       it('uses static color if no palette', async () => {
-        const staticColor = faker.internet.color();
+        const staticColor = faker.color.rgb();
 
         await renderChart({
           config: {
@@ -1213,7 +1213,7 @@ describe('MetricVisComponent', function () {
 
   describe('overrides', () => {
     it('should apply overrides to the settings component', async () => {
-      const color = faker.internet.color();
+      const color = faker.color.rgb();
       await renderChart({
         config: {
           metric: {
