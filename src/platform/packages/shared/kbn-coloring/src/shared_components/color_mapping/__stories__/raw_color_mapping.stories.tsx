@@ -42,7 +42,7 @@ const Template: StoryFn<FC<ColorMappingProps>> = (args) => {
     DEFAULT_COLOR_MAPPING_CONFIG
   );
 
-  const palettes = getKbnPalettes({ name: 'amsterdam', darkMode: false });
+  const palettes = getKbnPalettes({ darkMode: false });
   const colorFactory = getColorFactory(updatedModel, palettes, false, args.data);
 
   return (
