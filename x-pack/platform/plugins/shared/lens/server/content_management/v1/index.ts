@@ -7,6 +7,7 @@
 
 export { LENS_ITEM_VERSION } from './constants';
 
+export * from './transforms';
 export * from './service';
 export * from './schema';
 export type * from './types';

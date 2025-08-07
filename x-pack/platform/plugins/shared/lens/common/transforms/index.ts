@@ -6,3 +6,4 @@
  */
 
 export { ConfigBuilderStub } from './config_builder_stub';
+export type * from './types';
