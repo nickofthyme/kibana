@@ -19,7 +19,11 @@ import {
 import type { LensCreateIn, LensSavedObject } from '../../../content_management';
 import type { RegisterAPIRouteFn } from '../../types';
 import { ConfigBuilderStub } from '../../../../common/transforms';
-import { lensCreateRequestBodySchema, lensCreateResponseBodySchema } from './schema';
+import {
+  lensCreateRequestBodySchema,
+  lensCreateRequestQuerySchema,
+  lensCreateResponseBodySchema,
+} from './schema';
 import { getLensResponseItem } from '../utils';
 import { isNewApiFormat } from '../../../../common/transforms/config_builder_stub';
 
@@ -53,6 +57,7 @@ export const registerLensVisualizationsCreateAPIRoute: RegisterAPIRouteFn = (
       validate: {
         request: {
           body: lensCreateRequestBodySchema,
+          query: lensCreateRequestQuerySchema,
         },
         response: {
           201: {

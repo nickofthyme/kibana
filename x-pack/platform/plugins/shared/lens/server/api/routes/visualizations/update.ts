@@ -21,6 +21,7 @@ import { ConfigBuilderStub } from '../../../../common/transforms';
 import {
   lensUpdateRequestBodySchema,
   lensUpdateRequestParamsSchema,
+  lensUpdateRequestQuerySchema,
   lensUpdateResponseBodySchema,
 } from './schema';
 import { getLensResponseItem } from '../utils';
@@ -55,6 +56,7 @@ export const registerLensVisualizationsUpdateAPIRoute: RegisterAPIRouteFn = (
       validate: {
         request: {
           params: lensUpdateRequestParamsSchema,
+          // query: lensUpdateRequestQuerySchema,
           body: lensUpdateRequestBodySchema,
         },
         response: {

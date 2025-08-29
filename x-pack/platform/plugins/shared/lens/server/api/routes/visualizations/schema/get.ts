@@ -7,7 +7,7 @@
 
 import { schema } from '@kbn/config-schema';
 
-import { lensCMGetResultSchema, lensResponseItemSchema } from '../../../../content_management';
+import { lensAPIConfigSchema, lensCMGetResultSchema, lensResponseItemSchema } from '../../../../content_management';
 
 export const lensGetRequestParamsSchema = schema.object(
   {
@@ -22,7 +22,8 @@ export const lensGetRequestParamsSchema = schema.object(
 
 export const lensGetResponseBodySchema = schema.object(
   {
-    data: lensResponseItemSchema.getPropSchemas().data,
+    data: lensAPIConfigSchema,
+    // data: lensResponseItemSchema.getPropSchemas().data,
     meta: schema.object(
       {
         ...lensCMGetResultSchema.getPropSchemas().meta.getPropSchemas(), // include CM meta data

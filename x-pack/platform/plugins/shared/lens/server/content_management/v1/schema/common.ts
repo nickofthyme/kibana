@@ -7,6 +7,7 @@
 
 import { schema } from '@kbn/config-schema';
 import { savedObjectSchema } from '@kbn/content-management-utils';
+import { lensApiStateSchema } from '@kbn/lens-embeddable-utils/config_builder/schema';
 
 import { pickFromObjectSchema } from '../../../utils';
 import { LENS_ITEM_VERSION } from '../constants';
@@ -69,18 +70,20 @@ export const lensItemSchema = schema.object(
   { unknowns: 'forbid' }
 );
 
-/**
- * The Lens item data returned from the server
- */
-export const lensAPIConfigSchema = schema.object(
-  {
-    // TODO flatten this with new CB shape
-    ...pickFromObjectSchema(lensSavedObjectSchema.getPropSchemas(), ['id', 'references']),
-    // Spread attributes at root
-    ...lensAPIAttributesSchema.getPropSchemas(),
-  },
-  { unknowns: 'forbid' }
-);
+// /**
+//  * The Lens item data returned from the server
+//  */
+// export const lensAPIConfigSchema = schema.object(
+//   {
+//     // TODO flatten this with new CB shape
+//     ...pickFromObjectSchema(lensSavedObjectSchema.getPropSchemas(), ['id', 'references']),
+//     // Spread attributes at root
+//     ...lensAPIAttributesSchema.getPropSchemas(),
+//   },
+//   { unknowns: 'forbid' }
+// );
+
+export const lensAPIConfigSchema = lensApiStateSchema;
 
 /**
  * The Lens item meta returned from the server

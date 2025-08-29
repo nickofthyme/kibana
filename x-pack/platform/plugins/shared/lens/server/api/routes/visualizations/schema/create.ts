@@ -15,29 +15,21 @@ import {
 import { lensItemSchemaV0 } from '../../../../content_management/v0';
 import { pickFromObjectSchema } from '../../../../utils';
 
-const apiConfigData = lensAPIConfigSchema.extends({
-  id: undefined,
-});
+// const apiConfigData = lensAPIConfigSchema.extends({
+//   id: undefined,
+// });
 
 const v0ConfigData = lensItemSchemaV0.extends({
   id: undefined,
 });
 
-export const lensCreateRequestBodySchema = schema.object(
+export const lensCreateRequestQuerySchema = schema.object(
   {
-    data: schema.oneOf([
-      apiConfigData,
-      v0ConfigData, // Temporarily permit passing old v0 SO attributes on create
-    ]),
-    // TODO should these options be here or in params?
-    options: schema.object(
-      {
-        ...pickFromObjectSchema(lensCMCreateOptionsSchema.getPropSchemas(), ['overwrite']),
-      },
-      { unknowns: 'forbid' }
-    ),
+    ...pickFromObjectSchema(lensCMCreateOptionsSchema.getPropSchemas(), ['overwrite']),
   },
   { unknowns: 'forbid' }
 );
+
+export const lensCreateRequestBodySchema = lensAPIConfigSchema;
 
 export const lensCreateResponseBodySchema = lensResponseItemSchema;

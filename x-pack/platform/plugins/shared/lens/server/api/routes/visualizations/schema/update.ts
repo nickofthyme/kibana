@@ -27,27 +27,13 @@ export const lensUpdateRequestParamsSchema = schema.object(
   { unknowns: 'forbid' }
 );
 
-export const lensUpdateRequestBodySchema = schema.object(
+export const lensUpdateRequestQuerySchema = schema.object(
   {
-    data: schema.object(
-      {
-        ...lensAPIAttributesSchema.getPropSchemas(),
-        // omit id on create options
-        ...pickFromObjectSchema(lensAPIConfigSchema.getPropSchemas(), ['references']),
-      },
-      { unknowns: 'forbid' }
-    ),
-    // TODO should these options be here?
-    options: schema.object(
-      {
-        ...omit(lensCMUpdateOptionsSchema.getPropSchemas(), ['references']),
-      },
-      { unknowns: 'forbid' }
-    ),
+    ...omit(lensCMUpdateOptionsSchema.getPropSchemas(), ['references']),
   },
-  {
-    unknowns: 'forbid',
-  }
+  { unknowns: 'forbid' }
 );
+
+export const lensUpdateRequestBodySchema = lensAPIConfigSchema;
 
 export const lensUpdateResponseBodySchema = lensResponseItemSchema;
