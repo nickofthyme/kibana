@@ -88,6 +88,7 @@ export default function ({ getService }: FtrProviderContext) {
         'cases_manage_templates',
       ],
       observabilityAIAssistant: ['all', 'read', 'minimal_all', 'minimal_read'],
+      observabilityAlerts: ['all', 'read', 'minimal_all', 'minimal_read'],
       agentBuilder: [
         'all',
         'read',
@@ -110,12 +111,14 @@ export default function ({ getService }: FtrProviderContext) {
         'minimal_read',
         'workflow_create',
         'workflow_update',
-        'workflow_update_managed',
         'workflow_delete',
         'workflow_execute',
         'workflow_read',
         'workflow_execution_read',
         'workflow_execution_cancel',
+        'workflow_read_managed',
+        'workflow_execution_read_managed',
+        'workflow_update_managed',
       ],
       searchInferenceEndpoints: ['all', 'read', 'minimal_all', 'minimal_read'],
       fleetv2: [
@@ -135,6 +138,7 @@ export default function ({ getService }: FtrProviderContext) {
       actions: ['all', 'read', 'minimal_all', 'minimal_read', 'endpoint_security_execute'],
       anonymization: ['all', 'read', 'minimal_all', 'minimal_read'],
       stackAlerts: ['all', 'read', 'minimal_all', 'minimal_read'],
+      stackAlertsOnly: ['all', 'read', 'minimal_all', 'minimal_read'],
       ml: ['all', 'read', 'minimal_all', 'minimal_read'],
       siem: [
         'all',
@@ -484,6 +488,10 @@ export default function ({ getService }: FtrProviderContext) {
       maintenanceWindow: ['all', 'read', 'minimal_all', 'minimal_read'],
       queryActivity: ['all', 'read', 'minimal_all', 'minimal_read'],
       streams: ['all', 'read', 'minimal_all', 'minimal_read'],
+      alerting_v2_rules: ['all', 'read', 'minimal_all', 'minimal_read'],
+      alerting_v2_alerts: ['all', 'read', 'minimal_all', 'minimal_read'],
+      alerting_v2_action_policies: ['all', 'read', 'minimal_all', 'minimal_read'],
+      alerting_v2_execution_history: ['all', 'read', 'minimal_all', 'minimal_read'],
     },
     reserved: ['fleet-setup', 'ml_user', 'ml_admin', 'ml_apm_user', 'monitoring', 'reporting_user'],
   };

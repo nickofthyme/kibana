@@ -16,6 +16,7 @@ import { dataViewWithTimefieldMock } from '../../../__mocks__/data_view_with_tim
 import { discoverServiceMock } from '../../../__mocks__/services';
 import { fetchEsql, getTextBasedQueryStateToAstProps } from './fetch_esql';
 import type { TimeRange } from '@kbn/es-query';
+import { EMPTY_CONTEXT_AWARENESS_TOOLKIT } from '../../../context_awareness';
 
 describe('fetchEsql', () => {
   beforeEach(() => {
@@ -24,6 +25,7 @@ describe('fetchEsql', () => {
 
   const scopedProfilesManager = discoverServiceMock.profilesManager.createScopedProfilesManager({
     scopedEbtManager: discoverServiceMock.ebtManager.createScopedEBTManager(),
+    toolkit: EMPTY_CONTEXT_AWARENESS_TOOLKIT,
   });
   const fetchEsqlMockProps = {
     query: { esql: 'from *' },
@@ -32,6 +34,7 @@ describe('fetchEsql', () => {
     data: discoverServiceMock.data,
     expressions: discoverServiceMock.expressions,
     scopedProfilesManager,
+    isApproximate: false,
   };
 
   it('resolves with returned records', async () => {
@@ -131,6 +134,24 @@ describe('fetchEsql', () => {
     const result = getTextBasedQueryStateToAstProps(fetchEsqlMockProps);
 
     expect(result.time).toEqual(absoluteTimeRange);
+  });
+
+  it('passes isApproximate to the expression searchContext', async () => {
+    const expressionsExecuteSpy = jest.spyOn(discoverServiceMock.expressions, 'execute');
+    expressionsExecuteSpy.mockReturnValueOnce({
+      cancel: jest.fn(),
+      getData: jest.fn(() => of({ result: { columns: [], rows: [] } })),
+    } as unknown as ExecutionContract);
+
+    await fetchEsql({ ...fetchEsqlMockProps, isApproximate: true });
+
+    expect(expressionsExecuteSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      null,
+      expect.objectContaining({
+        searchContext: expect.objectContaining({ isApproximate: true }),
+      })
+    );
   });
 
   it('should add inline_highlights to the raw record when inline highlights are present', async () => {
