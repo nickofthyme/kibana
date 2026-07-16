@@ -8,7 +8,7 @@
  */
 
 import { z } from '@kbn/zod';
-import { DEFAULT_DATA_CONTROL_STATE } from '@kbn/controls-constants';
+import { ControlValuesSource, DEFAULT_DATA_CONTROL_STATE } from '@kbn/controls-constants';
 
 export const controlTitleSchema = z
   .object({
@@ -16,22 +16,59 @@ export const controlTitleSchema = z
   })
   .strict();
 
-export const dataControlSchema = z
+const sharedDataControlProps = z
   .object({
     ...controlTitleSchema.shape,
-    data_view_id: z.string().min(1).meta({
-      description: 'The ID of the data view that provides field options for this control.',
-    }), // this will generate a reference
-    field_name: z.string().min(1).meta({
-      description: 'The name of the field in the data view that this control filters on.',
-    }),
     use_global_filters: z.boolean().default(DEFAULT_DATA_CONTROL_STATE.use_global_filters).meta({
       description:
         "When `true`, the control's available options are narrowed by the page's active filters. Defaults to `true`.",
     }),
-    ignore_validations: z.boolean().default(DEFAULT_DATA_CONTROL_STATE.ignore_validations).meta({
-      description:
-        'When `true`, the control skips selection validation and does not report which selections are responsible for returning zero results. Defaults to `false`.',
-    }),
+    ignore_validations: z
+      .boolean()
+      .default(DEFAULT_DATA_CONTROL_STATE.ignore_validations)
+      .meta({
+        description:
+          'When `true`, the control skips selection validation and does not report which selections are responsible for returning zero results. Defaults to `false`.',
+      }),
   })
   .strict();
+
+/**
+ * This uses a union with only one option so we can provide a default value for backwards compat.
+ */
+export const dataControlFieldValuesSourceSchema = z
+  .literal(ControlValuesSource.FIELD)
+  .default(ControlValuesSource.FIELD)
+  .meta({
+    description:
+      'The source of the field options for this control. Defaults to `field` for legacy controls.',
+  });
+
+export const dataControlFieldVariantProps = {
+  ...sharedDataControlProps.shape,
+  values_source: dataControlFieldValuesSourceSchema,
+  data_view_id: z.string().min(1).meta({
+    description: 'The ID of the data view that provides field options for this control.',
+  }),
+  field_name: z.string().min(1).meta({
+    description: 'The name of the field in the data view that this control filters on.',
+  }),
+};
+
+export const dataControlEsqlVariantProps = {
+  ...sharedDataControlProps.shape,
+  values_source: z.literal(ControlValuesSource.ESQL),
+  esql_query: z.string().min(1).meta({
+    description: 'The ES|QL query that provides field options for this control',
+  }),
+};
+
+export const dataControlSchema = z
+  .discriminatedUnion('values_source', [
+    z.object(dataControlEsqlVariantProps).strict(),
+    z.object(dataControlFieldVariantProps).strict(),
+  ])
+  .meta({
+    description:
+      'The source of the field options for this control, either `field` for all possible values of a field, or `esql` for the results of an ES|QL query. Defaults to `field`',
+  });

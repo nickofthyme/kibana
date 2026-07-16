@@ -8,13 +8,14 @@
  */
 
 import { z } from '@kbn/zod';
-
-import { markdownAttributesSchemaZod } from '../markdown_saved_object/schema/v1/v1';
-import { markdownByValueStateSchema } from '../embeddable/schemas';
+import { markdownStateSchema } from '../embeddable/schemas';
 
 export const markdownLibraryItemSchema = z
   .object({
-    ...markdownAttributesSchemaZod.shape,
-    ...markdownByValueStateSchema.shape,
+    ...markdownStateSchema.shape,
+    // saved object description
+    description: z.string().optional().meta({ description: 'A short description of the markdown library item.' }),
+    // saved object title
+    title: z.string().min(1).meta({ description: 'The markdown library item title.' }),
   })
   .strict();

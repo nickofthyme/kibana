@@ -9,19 +9,35 @@
 
 import { z } from '@kbn/zod';
 import { DEFAULT_RANGE_SLIDER_STATE } from '@kbn/controls-constants';
-import { dataControlSchema } from './control_schema';
+import { dataControlEsqlVariantProps, dataControlFieldVariantProps } from './control_schema';
 
 export const rangeValueSchema = z.array(z.string()).length(2).meta({
   description:
     'The selected range as a two-element array of strings representing the lower and upper bound values, for example `["10", "50"]`.',
 });
 
-export const rangeSliderControlSchema = z
-  .object({
-    ...dataControlSchema.shape,
-    value: rangeValueSchema.optional(),
-    step: z.number().min(0).default(DEFAULT_RANGE_SLIDER_STATE.step).meta({
-      description: 'The step size between selectable range values.',
+const rangeSliderExtras = {
+  value: rangeValueSchema.optional(),
+  step: z.number().min(0).default(DEFAULT_RANGE_SLIDER_STATE.step).meta({
+    description: 'The step size between selectable range values.',
+  }),
+};
+
+export const rangeSliderControlSchema = z.discriminatedUnion('values_source', [
+  z
+    .object({ ...dataControlEsqlVariantProps, ...rangeSliderExtras })
+    .strict()
+    .meta({
+      id: 'kbn-controls-schemas-range-slider-control-schema-esql',
+      title: 'EsqlRangeSliderControl',
+      description: "A range slider control whose values come from an ES|QL query's results.",
     }),
-  })
-  .strict();
+  z
+    .object({ ...dataControlFieldVariantProps, ...rangeSliderExtras })
+    .strict()
+    .meta({
+      id: 'kbn-controls-schemas-range-slider-control-schema-field',
+      title: 'FieldRangeSliderControl',
+      description: 'A range slider control whose values come from a numeric data view field.',
+    }),
+]);

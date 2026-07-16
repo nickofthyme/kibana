@@ -15,6 +15,7 @@ import {
   applyColorToSchema,
   AUTO_COLOR,
   colorByValueAbsoluteSchema,
+  colorByValuePaletteSchema,
   legacyColorByValueAbsoluteSchema,
   autoColorSchema,
 } from '../color';
@@ -74,7 +75,12 @@ const legacyMetricConfigMetricOptionsShape = {
    * Color configuration
    */
   color: z
-    .union([colorByValueAbsoluteSchema, legacyColorByValueAbsoluteSchema, autoColorSchema])
+    .union([
+      colorByValueAbsoluteSchema,
+      colorByValuePaletteSchema,
+      legacyColorByValueAbsoluteSchema,
+      autoColorSchema,
+    ])
     .default(AUTO_COLOR)
     .optional()
     .meta({ description: 'Color configuration based on the metric value.' }),

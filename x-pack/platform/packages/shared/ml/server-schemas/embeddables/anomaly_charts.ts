@@ -6,50 +6,40 @@
  */
 
 import { z } from '@kbn/zod';
-import { mlEntityFieldSchema } from '@kbn/ml-anomaly-utils/schemas';
+import { ML_ANOMALY_THRESHOLD } from '@kbn/ml-anomaly-utils';
 import {
   serializedTimeRangeSchema,
   serializedTitlesSchema,
 } from '@kbn/presentation-publishing-schemas';
 
-export const severityThresholdSchema = z
-  .object({
-    min: z.number(),
-    max: z.number().optional(),
-  })
-  .strict();
+export const severityThresholdSchema = z.union([
+  z.object({ min: z.literal(ML_ANOMALY_THRESHOLD.LOW), max: z.literal(ML_ANOMALY_THRESHOLD.WARNING) }).strict(),
+  z.object({ min: z.literal(ML_ANOMALY_THRESHOLD.WARNING), max: z.literal(ML_ANOMALY_THRESHOLD.MINOR) }).strict(),
+  z.object({ min: z.literal(ML_ANOMALY_THRESHOLD.MINOR), max: z.literal(ML_ANOMALY_THRESHOLD.MAJOR) }).strict(),
+  z.object({ min: z.literal(ML_ANOMALY_THRESHOLD.MAJOR), max: z.literal(ML_ANOMALY_THRESHOLD.CRITICAL) }).strict(),
+  z.object({ min: z.literal(ML_ANOMALY_THRESHOLD.CRITICAL) }).strict(),
+]);
 
 export type SeverityThreshold = z.output<typeof severityThresholdSchema>;
-
-export const anomalyChartsEmbeddableRuntimeStateSchema = z
-  .object({
-    jobIds: z.array(z.string()).max(10000),
-    maxSeriesToPlot: z.number(),
-    severityThreshold: z.array(severityThresholdSchema).max(10000).optional(),
-    selectedEntities: z.array(mlEntityFieldSchema).max(10000).optional(),
-  })
-  .strict();
-
-export type AnomalyChartsEmbeddableRuntimeState = z.output<
-  typeof anomalyChartsEmbeddableRuntimeStateSchema
->;
-
-export const anomalyChartsEmbeddableOverridableStateSchema = z
-  .object({
-    ...anomalyChartsEmbeddableRuntimeStateSchema.shape,
-    ...serializedTimeRangeSchema.shape,
-  })
-  .strict();
-
-export type AnomalyChartsEmbeddableOverridableState = z.output<
-  typeof anomalyChartsEmbeddableOverridableStateSchema
->;
 
 export const anomalyChartsEmbeddableStateSchema = z
   .object({
     ...serializedTitlesSchema.shape,
-    ...anomalyChartsEmbeddableOverridableStateSchema.shape,
+    ...serializedTimeRangeSchema.shape,
+    job_ids: z.array(z.string().min(1).max(1000)).min(1).max(10000).meta({
+      description: 'Anomaly detection job or group IDs whose results are shown in the charts.',
+    }),
+    max_series_to_plot: z.number().min(1).max(50).optional().meta({
+      description: 'Maximum number of anomaly series to plot.',
+    }),
+    severity_threshold: z.array(severityThresholdSchema).max(5).optional().meta({
+      description: 'Severity threshold ranges used to filter anomaly results.',
+    }),
   })
-  .strict();
+  .strict()
+  .meta({
+    id: 'ml_anomaly_charts',
+    description: 'Anomaly Charts embeddable',
+  });
 
 export type AnomalyChartsEmbeddableState = z.output<typeof anomalyChartsEmbeddableStateSchema>;

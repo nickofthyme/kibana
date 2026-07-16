@@ -226,6 +226,24 @@ export type LensApiConfigESQL =
   | TreemapConfigESQL
   | WaffleConfigESQL;
 
+
+/**
+ * Extends `lensApiConfigSchema` with extra props.
+ *
+ * Returns a schema that accepts any `LensApiConfig` intersected with the provided props.
+ */
+export function extendLensApiConfigSchema<T extends z.ZodRawShape>(
+  props: T,
+  _options?: unknown
+): z.ZodType<LensApiConfig & z.objectOutputType<z.ZodObject<T>, z.ZodTypeAny>> {
+  const extension = z.object(props);
+  // cast required because z.lazy breaks type inference for complex unions
+  return lensApiConfigSchema.and(extension) as z.ZodType<
+    LensApiConfig & z.objectOutputType<z.ZodObject<T>, z.ZodTypeAny>
+  >;
+}
+
+
 export type {
   LensApiFieldMetricOrFormulaOperation,
   LensApiAllMetricOrFormulaOperations,
@@ -253,6 +271,12 @@ export type LensApiConfigChartType = LensApiConfig['type'];
 export type LensApiConfigByType = {
   [K in LensApiConfig['type']]: Extract<LensApiConfig, { type: K }>;
 };
+
+export { durationFormatSchema, legacyDurationFormatSchema } from './duration_units';
+export {
+  gaDurationInputUnitToLegacyApi,
+  gaDurationOutputUnitToLegacyApi,
+} from '../transforms/columns/duration_units';
 
 export {
   // Combined schemas

@@ -8,9 +8,20 @@
  */
 
 import type { z } from '@kbn/zod';
-import type { searchRequestParamsSchema, searchResponseBodySchema } from './schemas';
+import type {
+  legacySearchRequestParamsSchema,
+  legacySearchResponseBodySchema,
+  searchRequestParamsSchema,
+  searchResponseBodySchema,
+} from './schemas';
 
 /** The request parameters for searching dashboards */
 export type DashboardSearchRequestParams = z.output<typeof searchRequestParamsSchema>;
 /** The response body type for searching dashboards. */
 export type DashboardSearchResponseBody = z.output<typeof searchResponseBodySchema>;
+
+/** LEGACY **/
+/** The request parameters for searching dashboards */
+export type LegacyDashboardSearchRequestParams = z.output<typeof legacySearchRequestParamsSchema>;
+/** The response body type for searching dashboards. */
+export type LegacyDashboardSearchResponseBody = z.output<typeof legacySearchResponseBodySchema>;

@@ -12,10 +12,13 @@ import {
   DEFAULT_DSL_OPTIONS_LIST_STATE,
   DEFAULT_ESQL_OPTIONS_LIST_STATE,
   MAX_OPTIONS_LIST_REQUEST_SIZE,
+  SELECTIONS_MAX,
 } from '@kbn/controls-constants';
-import { controlTitleSchema, dataControlSchema } from './control_schema';
-
-const SELECTIONS_MAX = 10000;
+import {
+  controlTitleSchema,
+  dataControlEsqlVariantProps,
+  dataControlFieldVariantProps,
+} from './control_schema';
 
 export const optionsListDisplaySettingsSchema = z
   .object({
@@ -73,37 +76,54 @@ const optionsListControlBaseParameters = z
   })
   .strict();
 
-export const optionsListDSLControlSchema = z
-  .object({
-    ...optionsListControlBaseParameters.shape,
-    ...dataControlSchema.shape,
-    exclude: z.boolean().default(DEFAULT_DSL_OPTIONS_LIST_STATE.exclude).meta({
-      description:
-        'When `true`, the control filters to documents that do NOT match the selected options. Defaults to `false`.',
+const optionsListDSLExtras = {
+  ...optionsListControlBaseParameters.shape,
+  exclude: z.boolean().default(DEFAULT_DSL_OPTIONS_LIST_STATE.exclude).meta({
+    description:
+      'When `true`, the control filters to documents that do NOT match the selected options. Defaults to `false`.',
+  }),
+  exists_selected: z.boolean().default(DEFAULT_DSL_OPTIONS_LIST_STATE.exists_selected).meta({
+    description:
+      "When `true`, the control filters to documents where the field exists, regardless of the field's value. Defaults to `false`.",
+  }),
+  run_past_timeout: z.boolean().default(DEFAULT_DSL_OPTIONS_LIST_STATE.run_past_timeout).meta({
+    description:
+      'When `true`, the options list query continues running even if it exceeds the configured timeout threshold. Defaults to `false`.',
+  }),
+  search_technique: optionsListSearchTechniqueSchema,
+  selected_options: z
+    .array(optionsListSelectionSchema)
+    .max(SELECTIONS_MAX)
+    .default(DEFAULT_DSL_OPTIONS_LIST_STATE.selected_options)
+    .meta({
+      description: 'The list of currently selected option values.',
     }),
-    exists_selected: z.boolean().default(DEFAULT_DSL_OPTIONS_LIST_STATE.exists_selected).meta({
+  single_select: z.boolean().default(DEFAULT_DSL_OPTIONS_LIST_STATE.single_select).meta({
+    description:
+      'When `true`, only one option can be selected at a time. Selecting a new option deselects any previously selected option. Defaults to `false`.',
+  }),
+  sort: optionsListSortSchema,
+};
+
+export const optionsListDSLControlSchema = z.discriminatedUnion('values_source', [
+  z
+    .object({ ...dataControlEsqlVariantProps, ...optionsListDSLExtras })
+    .strict()
+    .meta({
+      id: 'kbn-controls-schemas-options-list-dsl-control-schema-esql',
+      title: 'EsqlOptionsListControl',
       description:
-        "When `true`, the control filters to documents where the field exists, regardless of the field's value. Defaults to `false`.",
+        "An options list control whose available options come from an ES|QL query's results.",
     }),
-    run_past_timeout: z.boolean().default(DEFAULT_DSL_OPTIONS_LIST_STATE.run_past_timeout).meta({
-      description:
-        'When `true`, the options list query continues running even if it exceeds the configured timeout threshold. Defaults to `false`.',
+  z
+    .object({ ...dataControlFieldVariantProps, ...optionsListDSLExtras })
+    .strict()
+    .meta({
+      id: 'kbn-controls-schemas-options-list-dsl-control-schema-field',
+      title: 'FieldOptionsListControl',
+      description: 'An options list control whose available options come from a data view field.',
     }),
-    search_technique: optionsListSearchTechniqueSchema,
-    selected_options: z
-      .array(optionsListSelectionSchema)
-      .max(SELECTIONS_MAX)
-      .default(DEFAULT_DSL_OPTIONS_LIST_STATE.selected_options)
-      .meta({
-        description: 'The list of currently selected option values.',
-      }),
-    single_select: z.boolean().default(DEFAULT_DSL_OPTIONS_LIST_STATE.single_select).meta({
-      description:
-        'When `true`, only one option can be selected at a time. Selecting a new option deselects any previously selected option. Defaults to `false`.',
-    }),
-    sort: optionsListSortSchema,
-  })
-  .strict();
+]);
 
 const baseEsqlControlSchema = z
   .object({

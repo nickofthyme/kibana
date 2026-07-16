@@ -190,13 +190,44 @@ export const colorByValuePercentageSchema = colorByValueBaseSchema
     description: 'Color by percentage value configuration',
   });
 
+export const colorByValuePaletteSchema = z
+  .object({
+    type: z.literal('distributed_palette'),
+    palette: z
+      .union([
+        z.literal('status'),
+        z.literal('temperature'),
+        z.literal('complementary'),
+        z.literal('negative'),
+        z.literal('positive'),
+        z.literal('cool'),
+        z.literal('warm'),
+        z.literal('gray'),
+      ])
+      .meta({
+        description: 'The name of the palette to apply across the value range.',
+      }),
+  })
+  .strict()
+  .meta({
+    id: 'colorByValuePalette',
+    title: 'Color By Value (Palette)',
+    description:
+      'Color by value using a palette, with colors distributed across the range of values.',
+  });
+
 export const colorByValueSchema = z
-  .union([colorByValueAbsoluteSchema, colorByValuePercentageSchema, legacyColorByValueSchema])
+  .union([
+    colorByValueAbsoluteSchema,
+    colorByValuePercentageSchema,
+    colorByValuePaletteSchema,
+    legacyColorByValueSchema,
+  ])
   .meta({
     id: 'colorByValue',
     title: 'Color By Value',
     description:
-      'Dynamic color mapping by numeric range, with support for absolute and percentage-based ranges.',
+      'Dynamic color mapping by numeric range, with support for absolute and percentage-based ranges and for named palettes.',
   });
 
 export const staticColorSchema = z
@@ -363,6 +394,7 @@ export const allColoringTypeSchema = z
 
 export type StaticColorType = z.output<typeof staticColorSchema>;
 export type ColorByValueType = z.output<typeof colorByValueSchema>;
+export type ColorByValuePaletteType = z.output<typeof colorByValuePaletteSchema>;
 export type ColorByValueAbsolute =
   | z.output<typeof colorByValueAbsoluteSchema>
   | z.output<typeof legacyColorByValueAbsoluteSchema>;

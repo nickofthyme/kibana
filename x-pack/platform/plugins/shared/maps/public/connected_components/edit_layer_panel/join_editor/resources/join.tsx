@@ -7,9 +7,9 @@
 
 import React, { Component } from 'react';
 import {
-  EuiFlexItem,
-  EuiFlexGroup,
   EuiButtonIcon,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiText,
   EuiTextColor,
   EuiToolTip,
@@ -290,9 +290,10 @@ export class Join extends Component<Props, State> {
           content={i18n.translate('xpack.maps.layerPanel.join.deleteJoinTitle', {
             defaultMessage: 'Delete join',
           })}
+          anchorClassName="mapJoinItem__delete"
+          disableScreenReaderOutput
         >
           <EuiButtonIcon
-            className="mapJoinItem__delete"
             iconType="trash"
             color="danger"
             aria-label={i18n.translate('xpack.maps.layerPanel.join.deleteJoinAriaLabel', {

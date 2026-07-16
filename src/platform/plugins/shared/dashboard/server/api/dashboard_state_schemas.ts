@@ -8,20 +8,19 @@
  */
 
 import { z } from '@kbn/zod';
-import { refreshIntervalSchema } from '@kbn/data-service-server';
 import { asCodeFilterSchema } from '@kbn/as-code-filters-schema';
-import { asCodeQuerySchema } from '@kbn/as-code-shared-schemas';
+import { asCodeQuerySchema, getAsCodeTagsSchema } from '@kbn/as-code-shared-schemas';
 import { getControlsGroupSchema } from '@kbn/controls-schemas';
+import { refreshIntervalSchema } from '@kbn/data-service-server';
 import { timeRangeSchema } from '@kbn/es-query-server';
-import { embeddableService } from '../kibana_services';
-
-import { DASHBOARD_GRID_COLUMN_COUNT } from '../../common/page_bundle_constants';
+import { isDashboardSection } from '../../common';
 import {
+  DEFAULT_DASHBOARD_OPTIONS,
   DEFAULT_PANEL_HEIGHT,
   DEFAULT_PANEL_WIDTH,
-  DEFAULT_DASHBOARD_OPTIONS,
 } from '../../common/constants';
-import { isDashboardSection } from '../../common';
+import { DASHBOARD_GRID_COLUMN_COUNT } from '../../common/page_bundle_constants';
+import { embeddableService } from '../kibana_services';
 import type { DashboardPanel, DashboardSection } from './types';
 
 const MAX_PANELS = 1000;
@@ -216,13 +215,16 @@ export function getDashboardStateSchema(
         description:
           'Controls [cross-project search](https://www.elastic.co/docs/explore-analyze/cross-project-search/cross-project-search-project-routing) behavior for this dashboard (Serverless only). Set to `_alias:_origin` to scope data to the current project, or `_alias:*` to search across all projects. When omitted, the space default applies.',
       }),
+      esql_approximation: z.boolean().optional().meta({
+        description:
+          'When `true`, ES|QL visualizations that use `STATS` run with [approximate execution](https://www.elastic.co/docs/reference/query-languages/esql/esql-query-approximation) for faster, estimated results.',
+      }),
       query: asCodeQuerySchema.optional(),
       refresh_interval: refreshIntervalSchema.optional(),
-      tags: z
-        .array(z.string())
-        .max(100)
-        .optional()
-        .meta({ description: 'Tag IDs to associate with this dashboard.' }),
+      tags: getAsCodeTagsSchema(
+        'Tag IDs to associate with this dashboard.',
+        isDashboardAppRequest && isReadRequest ? Number.MAX_SAFE_INTEGER : undefined
+      ).optional(),
       time_range: timeRangeSchema.optional(),
       title: z.string().min(1).meta({ description: 'A human-readable title for the dashboard.' }),
       access_control: accessControlSchema,

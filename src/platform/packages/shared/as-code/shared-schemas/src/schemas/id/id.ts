@@ -9,11 +9,12 @@
 
 import { z } from '@kbn/zod';
 import { isValidId } from './is_valid_id';
+import { MAX_ID_LENGTH } from '../../constants';
 
 export const asCodeIdSchema = z
   .string()
   .min(1)
-  .max(250)
+  .max(MAX_ID_LENGTH)
   .refine((value) => isValidId(value), {
     message: 'ID must contain only lowercase letters, numbers, hyphens, and underscores.',
   })

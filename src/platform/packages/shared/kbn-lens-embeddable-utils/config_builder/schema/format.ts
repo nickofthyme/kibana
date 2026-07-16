@@ -9,6 +9,7 @@
 
 import { z } from '@kbn/zod';
 import { LENS_FORMAT_NUMBER_DECIMALS_DEFAULT, LENS_FORMAT_COMPACT_DEFAULT } from './constants';
+import { durationFormatSchema, legacyDurationFormatSchema } from './duration_units';
 
 const numericFormatSchema = z
   .object({
@@ -68,37 +69,6 @@ const byteFormatSchema = z
     description: 'Data size format in bits or bytes, with optional decimal places and suffix.',
   });
 
-const durationFormatSchema = z
-  .object({
-    type: z.literal('duration'),
-    /**
-     * From
-     */
-    from: z.string().meta({
-      description:
-        'Source time unit for conversion, for example `milliseconds`, `seconds`, `minutes`, `hours`, or `days`.',
-    }),
-    /**
-     * To
-     */
-    to: z.string().meta({
-      description:
-        'Display time unit after conversion, for example `seconds`, `minutes`, `hours`, or `days`.',
-    }),
-    /**
-     * Suffix
-     */
-    suffix: z.string().optional().meta({
-      description: 'Suffix appended to the formatted value.',
-    }),
-  })
-  .strict()
-  .meta({
-    id: 'durationFormat',
-    title: 'Duration Format',
-    description: 'Duration format between time units.',
-  });
-
 const customFormatSchema = z
   .object({
     type: z.literal('custom'),
@@ -117,10 +87,19 @@ const customFormatSchema = z
   });
 
 /**
- * Format configuration
+ * Format configuration for dimension values.
+ * Accepts both GA and legacy unit names for the `duration` type so that neither is rejected at
+ * the HTTP validation layer. The route handlers enforce exactly one set at runtime based on the
+ * `asCode.useGASchemas` feature flag.
  */
 export const formatTypeSchema = z
-  .union([numericFormatSchema, byteFormatSchema, durationFormatSchema, customFormatSchema])
+  .union([
+    numericFormatSchema,
+    byteFormatSchema,
+    durationFormatSchema,
+    legacyDurationFormatSchema,
+    customFormatSchema,
+  ])
   .meta({
     id: 'formatType',
     title: 'Format Type',

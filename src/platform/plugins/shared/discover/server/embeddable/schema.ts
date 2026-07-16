@@ -54,7 +54,7 @@ export const viewModeSchema = z
       'Discover view mode. Choose "documents" (search hits), "patterns" (pattern analysis), or "aggregated" (field statistics).',
   });
 
-const dataTableLimitsSchema = z
+export const dataTableLimitsSchema = z
   .object({
     rows_per_page: z.number().min(1).max(10000).default(100).optional().meta({
       description:
@@ -68,7 +68,7 @@ const dataTableLimitsSchema = z
   .strict()
   .meta({ id: 'discoverSessionEmbeddableDataTableLimitsSchema' });
 
-const dataTableSchema = z
+export const dataTableSchema = z
   .object({
     column_order: z
       .array(
@@ -122,7 +122,7 @@ const dataTableSchema = z
   .strict()
   .meta({ id: 'discoverSessionEmbeddableDataTableSchema' });
 
-const panelOverridesSchema = z
+export const panelOverridesSchema = z
   .object({
     column_order: z
       .array(
@@ -185,7 +185,7 @@ const panelOverridesSchema = z
   .strict()
   .default({});
 
-const classicTabSchema = z
+export const classicTabSchema = z
   .object({
     ...dataTableSchema.shape,
     ...dataTableLimitsSchema.shape,
@@ -198,8 +198,9 @@ const classicTabSchema = z
   })
   .strict();
 
-const esqlTabSchema = dataTableSchema
+export const esqlTabSchema = dataTableSchema
   .extend({
+    ...dataTableLimitsSchema.shape,
     data_source: esqlDataSourceSchema,
   })
   .strict()
@@ -207,7 +208,7 @@ const esqlTabSchema = dataTableSchema
     description: 'ES|QL (Elasticsearch Query Language) data source.',
   });
 
-const tabSchema = z.union([classicTabSchema, esqlTabSchema]);
+export const tabSchema = z.union([classicTabSchema, esqlTabSchema]);
 
 const DISCOVER_SUPPORTED_DRILLDOWN_TRIGGERS = [ON_OPEN_PANEL_MENU];
 

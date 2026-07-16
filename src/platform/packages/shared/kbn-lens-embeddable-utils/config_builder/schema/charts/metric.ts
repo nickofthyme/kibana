@@ -15,6 +15,7 @@ import {
   DEFAULT_PRIMARY_VALUE_ALIGNMENT,
   DEFAULT_PRIMARY_VALUE_SIZING,
   DEFAULT_PRIMARY_ICON_ALIGNMENT,
+  DEFAULT_DENSITY,
   DEFAULT_SECONDARY_LABEL_VISIBLE,
   DEFAULT_SECONDARY_LABEL_PLACEMENT,
   DEFAULT_SECONDARY_VALUE_ALIGNMENT,
@@ -115,15 +116,27 @@ export const complementaryVizSchemaNoESQL = z
       'Secondary visualization displayed behind the primary metric value, either a bar chart (with optional max value) or a trend line.',
   });
 
-// Note: 'trend' type is not supported for ES|QL yet
-export const complementaryVizSchemaESQL = barBackgroundChartSchema
-  .extend({
-    /**
-     * Max value
-     */
-    max_value: esqlColumnSchema,
-  })
-  .meta({ id: 'metricComplementaryBar', title: 'Complementary Bar' });
+export const complementaryVizSchemaESQL = z
+  .union([
+    barBackgroundChartSchema
+      .extend({
+        /**
+         * Max value
+         */
+        max_value: esqlColumnSchema,
+      })
+      .meta({ id: 'metricComplementaryBar', title: 'Complementary Bar' }),
+    z
+      .object({
+        type: z.literal('trend'),
+      })
+      .strict(),
+  ])
+  .meta({
+    id: 'metricComplementaryVizESQL',
+    title: 'Complementary Visualization',
+    description: 'Bar chart or trendline shown behind the primary metric value.',
+  });
 
 const metricConfigBackgroundChartShapeNoESQL = {
   /**
@@ -141,6 +154,20 @@ const metricConfigBackgroundChartShapeESQL = {
 
 const metricStylingSchema = z
   .object({
+    /**
+     * Density preset for metric elements.
+     * Possible values:
+     * - 'compact': Compact density (original implementation)
+     * - 'default': Default density with increased spacing, paddings, and sizing
+     */
+    density: z
+      .union([z.literal('compact'), z.literal('default')])
+      .default(DEFAULT_DENSITY)
+      .optional()
+      .meta({
+        description:
+          'Density preset for the metric chart layout. Use `compact` for a compact layout, or `default` for increased padding, element spacing, and font size.',
+      }),
     /**
      * Icon configuration
      */

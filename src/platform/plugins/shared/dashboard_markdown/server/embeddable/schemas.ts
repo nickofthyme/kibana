@@ -11,37 +11,40 @@ import { z } from '@kbn/zod';
 import { serializedTitlesSchema } from '@kbn/presentation-publishing-schemas';
 import { BY_REF_SCHEMA_META, BY_VALUE_SCHEMA_META } from '@kbn/presentation-publishing-schemas';
 
-export const markdownByValueStateSchema = z
+export const markdownStateSchema = z
   .object({
-    content: z.string(),
+    content: z.string().meta({
+      description:
+        'The Markdown text rendered by the panel. Supports GitHub-flavored Markdown, including headings, paragraphs, lists, links, images, tables, blockquotes, and code blocks. Use `\\n` for line breaks within JSON strings.',
+    }),
     settings: z
       .object({
-        open_links_in_new_tab: z.boolean().default(true),
+        open_links_in_new_tab: z.boolean().default(true).meta({
+          description: 'Open links in a new browser tab.',
+        }),
       })
-      .strict(),
+      .strict()
+      .meta({ description: 'Display settings for the markdown panel.' }),
   })
   .strict();
 
-const markdownByReferenceStateSchema = z
-  .object({
-    ref_id: z.string().meta({
-      description: 'The unique identifier of the markdown library item.',
-    }),
-  })
-  .strict();
-
-export const markdownByValueEmbeddableSchema = markdownByValueStateSchema
+export const markdownByValueStateSchema = markdownStateSchema
   .extend(serializedTitlesSchema.shape)
   .strict()
   .meta(BY_VALUE_SCHEMA_META);
 
-const markdownByReferenceEmbeddableSchema = markdownByReferenceStateSchema
-  .extend(serializedTitlesSchema.shape)
+const markdownByReferenceStateSchema = z
+  .object({
+    ...serializedTitlesSchema.shape,
+    ref_id: z.string().meta({
+      description: 'The unique identifier of the markdown library item.',
+    }),
+  })
   .strict()
   .meta(BY_REF_SCHEMA_META);
 
 export const markdownEmbeddableSchema = z
-  .union([markdownByValueEmbeddableSchema, markdownByReferenceEmbeddableSchema])
+  .union([markdownByValueStateSchema, markdownByReferenceStateSchema])
   .meta({
     description: 'Markdown panel config',
   });
