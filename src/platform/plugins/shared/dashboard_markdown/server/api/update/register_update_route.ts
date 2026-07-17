@@ -13,7 +13,6 @@ import type { VersionedRouter } from '@kbn/core-http-server';
 import type { Logger, RequestHandlerContext } from '@kbn/core/server';
 import type { UsageCounter } from '@kbn/usage-collection-plugin/server';
 import { z } from '@kbn/zod';
-import { asCodeIdSchema } from '@kbn/as-code-shared-schemas';
 
 import { PUBLIC_API_VERSION, commonRouteConfig } from '../constants';
 import { updateRequestBodySchema, updateResponseBodySchema } from './schemas';
@@ -28,7 +27,7 @@ export function registerUpdateRoute(
 ) {
   const updateRoute = router.put({
     path: `${MARKDOWN_API_PATH}/{id}`,
-    summary: `Upsert markdown library item`,
+    summary: `Upsert a markdown library item`,
     ...commonRouteConfig,
     description: `Replaces the full state of a markdown library item. Partial updates are not supported.
 To make incremental changes, retrieve the item first, modify the fields you need, then send the complete object back.
@@ -46,7 +45,11 @@ If no item exists with the specified ID, a new one is created.`,
         request: {
           params: z
             .object({
-              id: asCodeIdSchema,
+              // Can not validate id at route level
+              // existing markdown panels may have invalid "as code" ids
+              id: z.string().meta({
+                description: 'The unique ID of the markdown library item to be created or updated.',
+              }),
             })
             .strict(),
           body: updateRequestBodySchema,
