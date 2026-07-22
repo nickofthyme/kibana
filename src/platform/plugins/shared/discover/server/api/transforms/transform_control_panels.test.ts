@@ -218,6 +218,32 @@ describe('control panel transforms', () => {
     });
   });
 
+  describe('unknown key stripping', () => {
+    it('strips unknown keys from control config instead of throwing', () => {
+      const result = transformControlPanelsOut(
+        JSON.stringify({
+          'control-1': {
+            order: 0,
+            type: 'esqlControl',
+            width: 'medium',
+            grow: true,
+            control_type: 'STATIC_VALUES',
+            variable_name: 'foo',
+            variable_type: 'values',
+            available_options: ['x'],
+            selected_options: ['x'],
+            single_select: true,
+            unknownLegacyKey: 'junk',
+          },
+        })
+      );
+
+      expect(result).toHaveLength(1);
+      expect(result![0].config).not.toHaveProperty('unknown_legacy_key');
+      expect(result![0].config).toHaveProperty('variable_name', 'foo');
+    });
+  });
+
   describe('transformControlPanelsIn', () => {
     it('maps API control_panels to stored flattened controlGroupJson', () => {
       const result = transformControlPanelsIn([

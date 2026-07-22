@@ -7,6 +7,7 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
+import { z } from '@kbn/zod/v4';
 import {
   ControlValuesSource,
   DEFAULT_DSL_OPTIONS_LIST_STATE,
@@ -54,11 +55,7 @@ beforeAll(() => {
       }
 
       if (type === 'invalidPanel') {
-        return {
-          parse: jest.fn().mockImplementation(() => {
-            throw new Error('Boo!');
-          }),
-        };
+        return z.object({ nope: z.string() }).strict();
       }
     }
     return {
@@ -160,16 +157,34 @@ describe('pinned panels', () => {
       []
     );
     expect(result.panels).toEqual(transformedPinnedPanels);
-    expect(result.warnings).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "message": "Unable to transform pinned panel config. Error: Boo!",
-          "panel_config": Object {},
-          "panel_type": "invalidPanel",
-          "type": "dropped_panel",
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0]).toMatchObject({
+      type: 'dropped_panel',
+      panel_type: 'invalidPanel',
+      panel_config: {},
+      message: expect.stringContaining('Unable to transform pinned panel config'),
+    });
+  });
+
+  it('should strip unknown keys from pinned control config instead of dropping', () => {
+    const result = transformPinnedPanelsOut(
+      undefined,
+      {
+        panels: {
+          control1: {
+            id: 'control1',
+            type: OPTIONS_LIST_CONTROL,
+            grow: true,
+            config: { data_view_id: 'dv', field_name: 'fn', unknownLegacyKey: 'junk' },
+            order: 0,
+          },
         },
-      ]
-    `);
+      } as DashboardSavedObjectAttributes['pinned_panels'],
+      []
+    );
+    expect(result.warnings).toHaveLength(0);
+    expect(result.panels[0].config).toHaveProperty('data_view_id', 'dv');
+    expect(result.panels[0].config).not.toHaveProperty('unknownLegacyKey');
   });
 
   describe('transform <9.4 legacy controls', () => {

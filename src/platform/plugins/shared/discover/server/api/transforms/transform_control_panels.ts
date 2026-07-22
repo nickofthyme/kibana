@@ -10,6 +10,7 @@
 import { isObject } from 'lodash';
 import { transformType } from '@kbn/embeddable-plugin/server';
 import { convertCamelCasedKeysToSnakeCase } from '@kbn/presentation-publishing';
+import { parseWithStrippedUnknownKeys } from '@kbn/zod-helpers/v4';
 import type { DiscoverSessionControlPanels } from '../schema';
 import { discoverSessionControlPanelsSchema } from '../schema';
 
@@ -55,7 +56,7 @@ export const transformControlPanelsOut = (
     return undefined;
   }
 
-  return discoverSessionControlPanelsSchema.parse(panels);
+  return parseWithStrippedUnknownKeys(discoverSessionControlPanelsSchema, panels);
 };
 
 export const transformControlPanelsIn = (

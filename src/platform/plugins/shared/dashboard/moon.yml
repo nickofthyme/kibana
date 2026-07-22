@@ -37,6 +37,7 @@ dependsOn:
   - '@kbn/spaces-plugin'
   - '@kbn/config-schema'
   - '@kbn/zod'
+  - '@kbn/zod-helpers'
   - '@kbn/utility-types'
   - '@kbn/es-query'
   - '@kbn/i18n'
