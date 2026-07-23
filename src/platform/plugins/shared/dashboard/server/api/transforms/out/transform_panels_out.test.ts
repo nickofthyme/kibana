@@ -7,6 +7,7 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
+import { z } from '@kbn/zod/v4';
 import { getDashboardStateSchema } from '../../dashboard_state_schemas';
 import { transformPanelsOut } from './transform_panels_out';
 
@@ -101,24 +102,20 @@ describe('transformPanelsOut', () => {
   });
 
   it('should drop invalid panels', () => {
+    const markdownSchema = z.object({ content: z.string() }).strict();
+    const invalidPanelSchema = z.object({ x: z.number() }).strict();
     mockGetTransforms.mockImplementation((type: string) => {
       if (type === 'DASHBOARD_MARKDOWN') {
         return {
           title: 'markdown',
-          transformOut: jest.fn().mockImplementation((val) => val), // just pass the value through
-          schema: {
-            parse: jest.fn().mockImplementation((val) => val),
-          },
+          transformOut: jest.fn().mockImplementation((val) => val),
+          schema: markdownSchema,
         };
       }
       if (type === 'invalidPanel') {
         return {
           title: 'invalid',
-          schema: {
-            parse: jest.fn().mockImplementation(() => {
-              throw new Error('Boo!');
-            }),
-          },
+          schema: invalidPanelSchema,
         };
       }
     });
@@ -150,36 +147,90 @@ describe('transformPanelsOut', () => {
       },
     ]);
 
-    expect(transformPanelsOut(panelsJSON, [], [], false)).toMatchInlineSnapshot(`
-      Object {
-        "panels": Array [
-          Object {
-            "config": Object {
-              "content": "Markdown panel content",
-            },
-            "grid": Object {
-              "h": 15,
-              "w": 24,
-              "x": 0,
-              "y": 0,
-            },
-            "id": "panel-1",
-            "type": "markdown",
-          },
-        ],
-        "warnings": Array [
-          Object {
-            "message": "Unable to transform panel config. Error: Boo!",
-            "panel_config": Object {
-              "invalid": true,
-            },
-            "panel_references": Array [],
-            "panel_type": "invalidPanel",
-            "type": "dropped_panel",
-          },
-        ],
-      }
-    `);
+    const result = transformPanelsOut(panelsJSON, [], [], false);
+    expect(result.panels).toEqual([
+      {
+        config: { content: 'Markdown panel content' },
+        grid: { h: 15, w: 24, x: 0, y: 0 },
+        id: 'panel-1',
+        type: 'markdown',
+      },
+    ]);
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0]).toMatchObject({
+      type: 'dropped_panel',
+      panel_type: 'invalidPanel',
+      panel_config: { invalid: true },
+      message: expect.stringContaining('Unable to transform panel config'),
+    });
+  });
+
+  it('should strip unknown keys from panel config instead of dropping', () => {
+    const strictSchema = z.object({ content: z.string() }).strict();
+    mockGetTransforms.mockImplementation(() => ({
+      schema: strictSchema,
+      transformOut: (val: unknown) => val,
+    }));
+
+    const panelsJSON = JSON.stringify([
+      {
+        type: 'test',
+        embeddableConfig: { content: 'hello', unknownKey: 'junk' },
+        panelIndex: 'panel-1',
+        gridData: { h: 15, w: 24, x: 0, y: 0 },
+      },
+    ]);
+
+    const result = transformPanelsOut(panelsJSON, [], [], false);
+    expect(result.warnings).toHaveLength(0);
+    expect(result.panels[0]).toMatchObject({ config: { content: 'hello' } });
+    expect((result.panels[0] as { config: Record<string, unknown> }).config).not.toHaveProperty(
+      'unknownKey'
+    );
+  });
+
+  it('should strip unknown keys from plain-union panel schema', () => {
+    const branchA = z.object({ kind: z.literal('a'), value: z.string() }).strict();
+    const branchB = z.object({ kind: z.literal('b'), count: z.number() }).strict();
+    const unionSchema = z.union([branchA, branchB]);
+    mockGetTransforms.mockImplementation(() => ({
+      schema: unionSchema,
+      transformOut: (val: unknown) => val,
+    }));
+
+    const panelsJSON = JSON.stringify([
+      {
+        type: 'test',
+        embeddableConfig: { kind: 'a', value: 'hi', unknownKey: 'junk' },
+        panelIndex: 'panel-1',
+        gridData: { h: 15, w: 24, x: 0, y: 0 },
+      },
+    ]);
+
+    const result = transformPanelsOut(panelsJSON, [], [], false);
+    expect(result.warnings).toHaveLength(0);
+    expect(result.panels[0]).toMatchObject({ config: { kind: 'a', value: 'hi' } });
+  });
+
+  it('should still drop panels with genuine validation errors', () => {
+    const strictSchema = z.object({ count: z.number() }).strict();
+    mockGetTransforms.mockImplementation(() => ({
+      schema: strictSchema,
+      transformOut: (val: unknown) => val,
+    }));
+
+    const panelsJSON = JSON.stringify([
+      {
+        type: 'test',
+        embeddableConfig: { count: 'not-a-number' },
+        panelIndex: 'panel-1',
+        gridData: { h: 15, w: 24, x: 0, y: 0 },
+      },
+    ]);
+
+    const result = transformPanelsOut(panelsJSON, [], [], false);
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0]).toMatchObject({ type: 'dropped_panel' });
   });
 
   it('should combine panelsJSON and sections', () => {

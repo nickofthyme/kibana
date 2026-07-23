@@ -21,3 +21,4 @@ export * from './non_empty_string';
 export * from './deep_strict';
 export * from './schema';
 export * from './iso_to_epoch';
+export * from './parse_with_stripped_unknown_keys';

@@ -10,6 +10,7 @@
 import { flow } from 'lodash';
 
 import type { SavedObjectReference } from '@kbn/core/server';
+import { parseWithStrippedUnknownKeys } from '@kbn/zod-helpers/v4';
 import { LENS_EMBEDDABLE_TYPE } from '@kbn/lens-common';
 import { transformTimeRangeOut, transformTitlesOut } from '@kbn/presentation-publishing';
 
@@ -130,7 +131,10 @@ function transformPanel(
     ) ?? defaultTransform(embeddableConfig);
 
   if (transforms?.schema) {
-    transformedPanelConfig = transforms.schema.parse(transformedPanelConfig);
+    transformedPanelConfig = parseWithStrippedUnknownKeys(
+      transforms.schema,
+      transformedPanelConfig
+    );
   }
 
   return {

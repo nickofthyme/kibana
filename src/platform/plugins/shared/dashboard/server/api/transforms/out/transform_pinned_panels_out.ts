@@ -10,6 +10,7 @@
 import { flow } from 'lodash';
 
 import type { Reference } from '@kbn/content-management-utils';
+import { parseWithStrippedUnknownKeys } from '@kbn/zod-helpers/v4';
 import {
   type LegacyIgnoreParentSettings,
   type LegacyStoredPinnedControlState,
@@ -145,7 +146,7 @@ function transformPanels(
         ) as DashboardPinnedPanel['config'];
       }
       if (schema) {
-        config = schema.parse(config) as DashboardPinnedPanel['config'];
+        config = parseWithStrippedUnknownKeys(schema, config) as DashboardPinnedPanel['config'];
       }
       transformedPanels.push({
         ...pinnedControlSchema.parse(rest),

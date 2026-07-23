@@ -106,6 +106,44 @@ describe('discover session API transforms', () => {
       expect(transformed).toEqual(discoverSessionApiData);
     });
 
+    it('reads session with dirty control panel (unknown key) without throwing', () => {
+      const dirtyControlGroupJson = JSON.stringify({
+        'control-1': {
+          order: 0,
+          type: ESQL_CONTROL,
+          width: 'medium',
+          grow: false,
+          control_type: 'STATIC_VALUES',
+          variable_name: 'foo',
+          variable_type: 'values',
+          available_options: ['bar'],
+          selected_options: ['bar'],
+          single_select: true,
+          unknownLegacyKey: 'junk',
+        },
+      });
+      const attributes = {
+        ...discoverSessionAttributes,
+        tabs: discoverSessionAttributes.tabs.map((tab, index) =>
+          index === 1
+            ? {
+                ...tab,
+                attributes: {
+                  ...tab.attributes,
+                  controlGroupJson: dirtyControlGroupJson,
+                },
+              }
+            : tab
+        ),
+      };
+      // Should not throw — unknown key is stripped
+      const transformed = transformDiscoverSessionOut(attributes);
+      const controlPanels = transformed.tabs[1].control_panels;
+      expect(controlPanels).toHaveLength(1);
+      expect(controlPanels![0].config).not.toHaveProperty('unknown_legacy_key');
+      expect(controlPanels![0].config).toHaveProperty('variable_name', 'foo');
+    });
+
     it('converts legacy flat tab sort to API sort objects', () => {
       const attributes = {
         ...discoverSessionAttributes,
