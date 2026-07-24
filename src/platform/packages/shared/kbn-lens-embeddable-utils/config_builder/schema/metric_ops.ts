@@ -119,7 +119,7 @@ export const esqlColumnSchema = z
     ...esqlColumn,
     ...labelSharedSchema.shape,
   })
-  .strict();
+  .strip();
 
 export const esqlColumnWithFormatSchema = esqlColumnSchema.extend(formatSchema.shape);
 

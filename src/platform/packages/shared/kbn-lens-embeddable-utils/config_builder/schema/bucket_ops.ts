@@ -90,7 +90,7 @@ const bucketTermsRankByCustomSharedSchema = z
       description: 'Sort direction for custom ranking.',
     }),
   })
-  .strict();
+  .strip();
 
 const bucketTermsRankByCustomOperationSchema = bucketTermsRankByCustomSharedSchema
   .extend({
@@ -198,7 +198,7 @@ export const bucketTermsOperationSchema = z
           description: 'When `true`, treats the values as regular expressions.',
         }),
       })
-      .strict()
+      .strip()
       .optional(),
     /**
      * Excludes
@@ -216,7 +216,7 @@ export const bucketTermsOperationSchema = z
           description: 'When `true`, treats the values as regular expressions.',
         }),
       })
-      .strict()
+      .strip()
       .optional(),
     /**
      * Other bucket
@@ -227,7 +227,7 @@ export const bucketTermsOperationSchema = z
           description: 'When `true`, includes documents that do not have the specified field.',
         }),
       })
-      .strict()
+      .strip()
       .optional(),
     /**
      * Rank by
@@ -245,7 +245,7 @@ export const bucketTermsOperationSchema = z
               description: 'Sort direction for alphabetical ranking.',
             }),
           })
-          .strict()
+          .strip()
           .meta({
             id: 'termsRankByAlphabetical',
             title: 'Terms Rank By Alphabetical',
@@ -261,7 +261,7 @@ export const bucketTermsOperationSchema = z
               description: 'Maximum number of rare terms to include.',
             }),
           })
-          .strict()
+          .strip()
           .meta({
             id: 'termsRankByRare',
             title: 'Terms Rank By Rarity',
@@ -271,7 +271,7 @@ export const bucketTermsOperationSchema = z
           .object({
             type: z.literal('significant'),
           })
-          .strict()
+          .strip()
           .meta({
             id: 'termsRankBySignificant',
             title: 'Terms Rank By Significance',
@@ -290,7 +290,7 @@ export const bucketTermsOperationSchema = z
               description: 'Sort direction for metric-based ranking.',
             }),
           })
-          .strict()
+          .strip()
           .meta({
             id: 'termsRankByMetric',
             title: 'Terms Rank By Metric',
@@ -396,7 +396,7 @@ export const bucketRangesOperationSchema = z
               description: 'Label.',
             }),
           })
-          .strict()
+          .strip()
       )
       .max(100),
   })
