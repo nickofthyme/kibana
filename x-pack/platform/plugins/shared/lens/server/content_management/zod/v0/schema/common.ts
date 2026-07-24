@@ -26,7 +26,7 @@ export const lensItemAttributesSchemaV0 = z
     visState: z.string().optional(),
     savedSearchRefName: z.string().optional(),
   })
-  .loose();
+  .strip();
 
 /**
  * The underlying SO type used to store Lens state in Content Management.
