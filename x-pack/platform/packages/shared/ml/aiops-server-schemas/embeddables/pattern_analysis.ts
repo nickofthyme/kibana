@@ -58,7 +58,7 @@ export const patternAnalysisEmbeddableStateSchema = z
         description: 'The probability to use for random sampling (between 0.00001 and 0.5).',
       }),
   })
-  .strict()
+  .strip()
   .superRefine((value, ctx) => {
     if (
       value.random_sampler_mode === RANDOM_SAMPLER_OPTION.ON_MANUAL &&

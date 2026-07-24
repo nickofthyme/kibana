@@ -60,7 +60,7 @@ export const changePointChartEmbeddableStateSchema = z
         description: `The maximum number of change points to visualize. Defaults to ${CHANGE_POINT_CHART_DEFAULT_SERIES}.`,
       }),
   })
-  .strict()
+  .strip()
   .refine((value) => value.partitions === undefined || value.split_field !== undefined, {
     message: '`partitions` requires `split_field` to be set',
   })

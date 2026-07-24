@@ -218,7 +218,7 @@ function withPanelSchemas<T extends z.ZodRawShape>(
         ...getDrilldownsSchema(DISCOVER_SUPPORTED_DRILLDOWN_TRIGGERS).shape,
         ...embeddableSchema.shape,
       })
-      .strict()
+      .strip()
       .meta(allMeta);
   };
 }

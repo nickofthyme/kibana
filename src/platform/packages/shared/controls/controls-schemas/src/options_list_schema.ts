@@ -151,7 +151,7 @@ const baseEsqlControlSchema = z
           'The ES|QL variable type that determines how the selected value is substituted into the query. Accepts `fields`, `values`, `functions`, `time_literal`, or `multi_values`.',
       }),
   })
-  .strict();
+  .strip();
 
 export const optionsListESQLControlSchema = z.discriminatedUnion('control_type', [
   baseEsqlControlSchema
@@ -161,7 +161,7 @@ export const optionsListESQLControlSchema = z.discriminatedUnion('control_type',
         description: 'A fixed list of option strings displayed in the control.',
       }),
     })
-    .strict()
+    .strip()
     .meta({
       id: 'kbn-controls-schemas-options-list-esql-control-schema-static-values',
       title: 'STATIC_VALUES',
@@ -176,7 +176,7 @@ export const optionsListESQLControlSchema = z.discriminatedUnion('control_type',
           'An ES|QL query whose results populate the list of available options in the control popover.',
       }),
     })
-    .strict()
+    .strip()
     .meta({
       id: 'kbn-controls-schemas-options-list-esql-control-schema-values-from-query',
       title: 'VALUES_FROM_QUERY',

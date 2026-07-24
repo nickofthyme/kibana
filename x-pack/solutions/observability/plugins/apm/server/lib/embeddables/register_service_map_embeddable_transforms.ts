@@ -21,6 +21,7 @@ const getServiceMapEmbeddableSchema = (_getDrilldownsSchema: GetDrilldownsSchema
       ...serializedTimeRangeSchema.shape,
       ...serviceMapCustomStateSchema.shape,
     })
+    .strip()
     .meta({
       id: 'apm-service-map-embeddable',
       description: 'APM service map embeddable schema',

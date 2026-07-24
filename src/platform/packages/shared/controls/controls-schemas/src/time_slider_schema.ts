@@ -35,4 +35,4 @@ export const timeSliderControlSchema = z
         'When `true`, the start of the time window is fixed at the beginning of the global time range. Only the end of the window can be adjusted. Defaults to `false`.',
     }),
   })
-  .strict();
+  .strip();

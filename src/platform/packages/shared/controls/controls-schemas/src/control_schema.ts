@@ -64,7 +64,7 @@ export const dataControlFieldVariantSchema = z
       description: 'The name of the field in the data view that this control filters on.',
     }),
   })
-  .strict();
+  .strip();
 
 export const dataControlEsqlVariantSchema = z
   .object({
@@ -74,7 +74,7 @@ export const dataControlEsqlVariantSchema = z
       description: 'The ES|QL query that provides field options for this control',
     }),
   })
-  .strict();
+  .strip();
 
 export const dataControlSchema = z.preprocess(
   withFieldValuesSourceDefault,

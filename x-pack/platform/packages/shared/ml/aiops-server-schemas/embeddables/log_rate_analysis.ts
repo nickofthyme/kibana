@@ -19,7 +19,7 @@ export const logRateAnalysisEmbeddableStateSchema = z
       description: 'The data view ID used to run log rate analysis.',
     }),
   })
-  .strict()
+  .strip()
   .meta({
     id: 'aiops_log_rate_analysis',
     description: 'Log rate analysis embeddable schema',

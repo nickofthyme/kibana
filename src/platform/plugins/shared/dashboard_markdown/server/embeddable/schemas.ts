@@ -34,7 +34,7 @@ export const markdownByValueStateSchema = z
     ...serializedTitlesSchema.shape,
     ...markdownStateSchema.shape,
   })
-  .strict()
+  .strip()
   .meta(BY_VALUE_SCHEMA_META);
 
 const markdownByReferenceStateSchema = z
@@ -44,7 +44,7 @@ const markdownByReferenceStateSchema = z
       description: 'The unique identifier of the markdown library item.',
     }),
   })
-  .strict()
+  .strip()
   .meta(BY_REF_SCHEMA_META);
 
 export const markdownEmbeddableSchema = z
