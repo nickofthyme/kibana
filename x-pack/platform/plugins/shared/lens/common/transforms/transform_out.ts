@@ -96,14 +96,24 @@ export const getTransformOut = (
       throw new Error(`Lens "${chartType}" chart type is not supported`);
     }
 
+    let toAPIFormatResult;
+    try {
+      toAPIFormatResult = builder.toAPIFormat({
+        ...injectedAttributes,
+        visualizationType: injectedAttributes.visualizationType ?? LENS_UNKNOWN_VIS,
+      });
+    } catch {
+      // Fall back to legacy format for panels that can't be converted to API format
+      // (e.g. panels with unsupported datasource types or incomplete state).
+      // The client already handles both legacy and API formats gracefully.
+      return injectedState as LensByValueTransformOutResult;
+    }
+
     const {
       title: attributesTitle, // attributes title is only a legacy fallback (see below)
       description: attributesDescription,
       ...apiConfig
-    } = builder.toAPIFormat({
-      ...injectedAttributes,
-      visualizationType: injectedAttributes.visualizationType ?? LENS_UNKNOWN_VIS,
-    });
+    } = toAPIFormatResult;
 
     // For by-value panels the panel-level title/description take precedence and the
     // attributes title/description are ignored. Legacy by-value panels, however, were
