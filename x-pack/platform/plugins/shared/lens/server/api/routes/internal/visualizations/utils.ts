@@ -78,22 +78,18 @@ export function getLensInternalResponseItem<M extends Record<string, string | bo
   const useApiFormat = builder.isEnabled && builder.isSupported(attributes.visualizationType);
 
   if (useApiFormat) {
-    try {
-      const data = builder.toAPIFormat({
-        references,
-        ...attributes,
-        // TODO: fix these type issues
-        state: attributes.state!,
-        visualizationType: attributes.visualizationType ?? LENS_UNKNOWN_VIS,
-      });
-      return {
-        id,
-        data,
-        meta,
-      } satisfies LensResponseItem;
-    } catch {
-      // fall through to legacy format for broken/invalid visualizations
-    }
+    const data = builder.toAPIFormat({
+      references,
+      ...attributes,
+      // TODO: fix these type issues
+      state: attributes.state!,
+      visualizationType: attributes.visualizationType ?? LENS_UNKNOWN_VIS,
+    });
+    return {
+      id,
+      data,
+      meta,
+    } satisfies LensResponseItem;
   }
 
   return {

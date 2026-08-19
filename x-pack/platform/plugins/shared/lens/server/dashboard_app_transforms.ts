@@ -5,7 +5,6 @@
  * 2.0.
  */
 
-import { z } from '@kbn/zod';
 import type { LensConfigBuilder } from '@kbn/lens-embeddable-utils';
 import type { LensSerializedAPIConfig } from '@kbn/lens-common-2';
 
@@ -16,15 +15,6 @@ import { getTransformIn } from '../common/transforms/transform_in';
 import { getTransformOut } from '../common/transforms/transform_out';
 import type { LensTransforms } from '../common/transforms/types';
 import { getLensPanelSchema } from './transforms';
-
-// Accepts legacy-format panels that could not be converted to API format during
-// transformOut (e.g. panels with unsupported datasource types or incomplete state).
-// The client already handles both legacy and API formats gracefully.
-const legacyByValueFallbackSchema = z
-  .object({
-    attributes: z.any(),
-  })
-  .passthrough();
 
 export function registerLensEmbeddableTransformsForDashboardApp(
   embeddableSetup: EmbeddableSetup,
@@ -38,8 +28,7 @@ export function registerLensEmbeddableTransformsForDashboardApp(
         transformOut: getTransformOut(builder, drilldownTransforms.transformOut, true),
       } satisfies LensTransforms),
     getSchema: (getDrilldownsSchema) => {
-      if (!builder.isEnabled) return undefined;
-      return z.union([getLensPanelSchema(getDrilldownsSchema), legacyByValueFallbackSchema]);
+      return builder.isEnabled ? getLensPanelSchema(getDrilldownsSchema) : undefined;
     },
     throwOnUnmappedPanel: (config: LensSerializedAPIConfig) => {
       if (isByRefLensConfig(config)) return;
